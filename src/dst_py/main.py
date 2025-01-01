@@ -1,27 +1,24 @@
 import random
 from datetime import datetime, timezone
 
-import aiohttp
+import requests
 from fastapi import FastAPI
 
 app = FastAPI()
 
 
-@app.get("/")
-async def read_root():
+@app.get("/users")
+def read_users():
     current_time = datetime.now(timezone.utc).isoformat()
     random_value = random.random()
+    response = requests.get("https://jsonplaceholder.typicode.com/users")
 
-    async with aiohttp.ClientSession() as session:
-        async with session.get(
-            "https://jsonplaceholder.typicode.com/users"
-        ) as response:
-            return {
-                "time": current_time,
-                "value": random_value,
-                "status": response.status,
-                "users": await response.json(),
-            }
+    return {
+        "time": current_time,
+        "value": random_value,
+        "status": response.status_code,
+        "users": response.json(),
+    }
 
 
 @app.get("/ping")
