@@ -15,7 +15,7 @@ def read_users():
 
     return {
         "time": current_time,
-        "value": random_value,
+        "random": random_value,
         "status": response.status_code,
         "users": response.json(),
     }
