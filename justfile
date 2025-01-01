@@ -4,11 +4,25 @@ set export
 default:
     just --list --unsorted
 
+# Run server
 run: prepare
     #!/bin/zsh
 
     . .venv/bin/activate
     fastapi dev src/dst_py/main.py
+
+# Test
+test: prepare
+    #!/bin/zsh
+
+    rye test
+
+# Test with code coverage
+test-cov:
+    #!/bin/zsh
+
+    . .venv/bin/activate
+    pytest --cov=src/dst_py tests/
 
 # Prepare project to work with
 prepare: install-modules

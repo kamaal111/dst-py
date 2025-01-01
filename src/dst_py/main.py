@@ -22,3 +22,8 @@ async def read_root():
                 "status": response.status,
                 "users": await response.json(),
             }
+
+
+@app.get("/ping")
+async def ping():
+    return {"message": "PONG"}
