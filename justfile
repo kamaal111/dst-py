@@ -4,11 +4,11 @@ set export
 default:
     just --list --unsorted
 
-run:
+run: prepare
     #!/bin/zsh
 
     . .venv/bin/activate
-    fastapi dev main.py
+    fastapi dev src/dst_py/main.py
 
 # Prepare project to work with
 prepare: install-modules
