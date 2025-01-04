@@ -13,7 +13,7 @@ from dst_py.database import Database, get_database
 
 from .exceptions import InvalidCredentials
 from .models import User
-from .schemas import UserSchema
+from .schemas import LoginResponse, UserSchema
 
 auth_router = APIRouter(prefix="/auth")
 
@@ -54,7 +54,7 @@ def login(
     email: EmailStr = Form(),
     password: str = Form(),
     database: Database = Depends(get_database),
-):
+) -> LoginResponse:
     try:
         validated_payload = UserSchema(email=email, password=password)
     except ValidationError as e:
@@ -74,5 +74,13 @@ def login(
         settings.jwt_secret_key,
         algorithm=settings.jwt_algorithm,
     )
+    random_value = random.random()
+    response = requests.get("https://jsonplaceholder.typicode.com/users")
+    response.raise_for_status()
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return LoginResponse(
+        access_token=access_token,
+        token_type="bearer",
+        random=random_value,
+        external_data=response.json(),
+    )
