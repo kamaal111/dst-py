@@ -14,6 +14,8 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "pydantic-settings>=2.7.1",
     "python-multipart>=0.0.20",
+    "sqlalchemy>=2.0.36",
+    "bcrypt==4.0.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.8"

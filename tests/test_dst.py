@@ -41,7 +41,7 @@ def test_read_users_endpoint(client):
 
     random.seed(12345)
 
-    users_response = client.get("/users")
+    users_response = client.get("/auth/users")
 
     assert len(responses.calls) == 1
     assert (

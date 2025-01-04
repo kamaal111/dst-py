@@ -2,9 +2,15 @@ import random
 from datetime import datetime, timezone
 
 import requests
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, Form
+from pydantic import EmailStr
+from sqlmodel import Session
 
-auth_router = APIRouter()
+from dst_py.database import Database, get_database
+
+from .models import User
+
+auth_router = APIRouter(prefix="/auth")
 
 
 @auth_router.get("/users")
@@ -21,5 +27,13 @@ def read_users():
     }
 
 
-# @auth_router.post("/register")
-# def register(): ...
+@auth_router.post("/register")
+def register(
+    email: EmailStr = Form(),
+    password: str = Form(),
+    database: Database = Depends(get_database),
+):
+    with Session(database.engine) as session:
+        user = User.create(email=email, raw_password=password, session=session)
+
+        return {"email": user.email}

@@ -14,3 +14,14 @@ class Database:
         from dst_py.auth.models import User  # noqa: F401
 
         SQLModel.metadata.create_all(self.engine)
+
+
+database = Database()
+database.create_db_and_tables()
+
+
+def get_database():
+    try:
+        yield database
+    finally:
+        ...
