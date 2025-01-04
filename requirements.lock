@@ -16,6 +16,8 @@ anyio==4.7.0
     # via httpx
     # via starlette
     # via watchfiles
+bcrypt==4.2.1
+    # via passlib
 certifi==2024.12.14
     # via httpcore
     # via httpx
@@ -55,19 +57,27 @@ markdown-it-py==3.0.0
     # via rich
 markupsafe==3.0.2
     # via jinja2
-    # via werkzeug
 mdurl==0.1.2
     # via markdown-it-py
+passlib==1.7.4
+    # via dst-py
 pydantic==2.10.4
     # via fastapi
+    # via pydantic-settings
     # via sqlmodel
 pydantic-core==2.27.2
     # via pydantic
+pydantic-settings==2.7.1
+    # via dst-py
 pygments==2.18.0
     # via rich
+pyjwt==2.10.1
+    # via dst-py
 python-dotenv==1.0.1
+    # via pydantic-settings
     # via uvicorn
 python-multipart==0.0.20
+    # via dst-py
     # via fastapi
 pyyaml==6.0.2
     # via uvicorn
@@ -108,5 +118,3 @@ watchfiles==1.0.3
     # via uvicorn
 websockets==14.1
     # via uvicorn
-werkzeug==3.1.3
-    # via dst-py
