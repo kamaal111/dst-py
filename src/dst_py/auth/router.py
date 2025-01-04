@@ -2,13 +2,14 @@ import random
 from datetime import datetime, timezone
 
 import requests
-from fastapi import APIRouter, Depends, Form
-from pydantic import EmailStr
+from fastapi import APIRouter, Depends, Form, HTTPException
+from pydantic import EmailStr, ValidationError
 from sqlmodel import Session
 
 from dst_py.database import Database, get_database
 
 from .models import User
+from .schemas import UserSchema
 
 auth_router = APIRouter(prefix="/auth")
 
@@ -33,7 +34,12 @@ def register(
     password: str = Form(),
     database: Database = Depends(get_database),
 ):
+    try:
+        validated_payload = UserSchema(email=email, password=password)
+    except ValidationError as e:
+        raise HTTPException(400, e.errors()) from e
+
     with Session(database.engine) as session:
-        user = User.create(email=email, raw_password=password, session=session)
+        user = User.create(payload=validated_payload, session=session)
 
         return {"email": user.email}

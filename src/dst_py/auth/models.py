@@ -6,6 +6,7 @@ from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, SQLModel, Session, select
 
 from .exceptions import UserAlreadyExists
+from .schemas import UserSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -19,14 +20,14 @@ class User(SQLModel, table=True):
     password: str
 
     @staticmethod
-    def create(email: str, raw_password: str, session: Session, commit=True) -> User:
-        existing_user_query = select(User).where(User.email == email).limit(1)
+    def create(payload: UserSchema, session: Session, commit=True) -> User:
+        existing_user_query = select(User).where(User.email == payload.email).limit(1)
         existing_user = session.exec(existing_user_query).first()
         if existing_user is not None:
             raise UserAlreadyExists()
 
-        hashed_password = pwd_context.hash(raw_password)
-        user = User(email=email, password=hashed_password)
+        hashed_password = pwd_context.hash(payload.password)
+        user = User(email=payload.email, password=hashed_password)
 
         session.add(user)
         if commit:
