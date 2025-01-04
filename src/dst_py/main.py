@@ -4,7 +4,12 @@ from datetime import datetime, timezone
 import requests
 from fastapi import FastAPI
 
+from dst_py.database import Database
+
 app = FastAPI()
+
+database = Database()
+database.create_db_and_tables()
 
 
 @app.get("/users")
