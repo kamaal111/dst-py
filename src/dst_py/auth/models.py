@@ -19,10 +19,18 @@ class User(SQLModel, table=True):
     email: EmailStr
     password: str
 
+    def verify_password(self, raw_password: str) -> bool:
+        return pwd_context.verify(raw_password, self.password)
+
     @staticmethod
-    def create(payload: UserSchema, session: Session, commit=True) -> User:
-        existing_user_query = select(User).where(User.email == payload.email).limit(1)
-        existing_user = session.exec(existing_user_query).first()
+    def get_by_email(email: str, session: Session) -> User | None:
+        query = select(User).where(User.email == email).limit(1)
+
+        return session.exec(query).first()
+
+    @classmethod
+    def create(cls, payload: UserSchema, session: Session, commit=True) -> User:
+        existing_user = User.get_by_email(email=payload.email, session=session)
         if existing_user is not None:
             raise UserAlreadyExists()
 
