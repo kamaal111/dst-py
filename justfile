@@ -15,7 +15,8 @@ run: prepare
 test: prepare
     #!/bin/zsh
 
-    rye test
+    . .venv/bin/activate
+    pytest
 
 # Test with code coverage
 test-cov:
