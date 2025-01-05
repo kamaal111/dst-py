@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dst-play
+    ports:
+      - 8000:8000
+    environment:
+      JWT_ALGORITHM: HS256
+      JWT_SECRET_KEY: not_so_secure_secret
+      JWT_EXPIRE_MINUTES: 30
+      DATABASE_URL: sqlite:///database.db
+    volumes:
+      - .:/app

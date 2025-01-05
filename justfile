@@ -1,11 +1,28 @@
 set export
 
+JWT_ALGORITHM := "HS256"
+JWT_SECRET_KEY := "not_so_secure_secret"
+JWT_EXPIRE_MINUTES := "30"
+DATABASE_URL := "sqlite:///database.db"
+
 # List available commands
 default:
     just --list --unsorted
 
 # Run server
-run: prepare
+run:
+    docker compose up
+
+# Run server detached
+run-d:
+    docker compose up -d
+
+# Tear down server
+tear:
+    docker compose down
+
+# Run local server
+run-local: prepare
     #!/bin/zsh
 
     . .venv/bin/activate
@@ -17,6 +34,10 @@ test: prepare
 
     . .venv/bin/activate
     pytest
+
+# Build container
+build:
+    docker build -t dst-py .
 
 # Test with code coverage
 test-cov:

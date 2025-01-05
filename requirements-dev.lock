@@ -48,8 +48,6 @@ fastapi-cli==0.0.7
 filelock==3.16.1
     # via virtualenv
 freezegun==1.5.1
-greenlet==3.1.1
-    # via sqlalchemy
 h11==0.14.0
     # via httpcore
     # via uvicorn
@@ -86,6 +84,7 @@ pluggy==1.5.0
     # via pytest
 pre-commit==4.0.1
 pydantic==2.10.4
+    # via dst-py
     # via fastapi
     # via pydantic-settings
     # via sqlmodel
