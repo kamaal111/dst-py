@@ -16,7 +16,11 @@ from dst_py.main import app
 
 class DatabaseForTests(BaseDatabase):
     def __init__(self, database_name: str) -> None:
-        super().__init__(create_engine(database_name, echo=False))
+        super().__init__(
+            create_engine(
+                database_name, connect_args={"check_same_thread": False}, echo=False
+            )
+        )
 
 
 def get_database_override(database: DatabaseForTests):
@@ -32,14 +36,15 @@ def get_databaseless_override():
 
 @pytest.fixture
 def database():
-    database_filename = f"{uuid.uuid4()}.db"
-    database = DatabaseForTests(f"sqlite:///{database_filename}")
+    temporary_directory = __get_or_create_temporary_directory_if_not_exists()
+    database_path = temporary_directory / f"{uuid.uuid4()}.db"
+    database = DatabaseForTests(f"sqlite:///{database_path}")
     database.create_db_and_tables()
 
     try:
         yield database
     finally:
-        Path(database_filename).unlink()
+        database_path.unlink()
 
 
 @pytest.fixture(scope="function")
@@ -89,3 +94,10 @@ def freeze_test_time():
 def deterministic_random():
     random.seed(12345)
     yield
+
+
+def __get_or_create_temporary_directory_if_not_exists():
+    temporary_directory = Path("tmp")
+    temporary_directory.mkdir(parents=True, exist_ok=True)
+
+    return temporary_directory

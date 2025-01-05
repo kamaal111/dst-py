@@ -51,6 +51,7 @@ def test_deterministic_login(
     assert len(json_response["external_data"]) == 1
     assert json_response["external_data"][0] == USER
     assert json_response["random"] == 0.41661987254534116
+    assert json_response["token_type"] == "bearer"
     assert (
         json_response["access_token"]
         == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImV4cCI6MTczNTcyNzQwMH0.WB-Skcc2-Qjtmun2SftTdCeSpGmpZOHmXGfeAvapidA"
