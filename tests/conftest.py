@@ -26,6 +26,10 @@ def get_database_override(database: DatabaseForTests):
     return override
 
 
+def get_databaseless_override():
+    yield None
+
+
 @pytest.fixture
 def database():
     database_filename = f"{uuid.uuid4()}.db"
@@ -43,7 +47,21 @@ def client(database, create_default_user):
     __client = TestClient(app)
     app.dependency_overrides[get_database] = get_database_override(database)
 
-    yield __client
+    try:
+        yield __client
+    finally:
+        app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="function")
+def databaseless_client():
+    __client = TestClient(app)
+    app.dependency_overrides[get_database] = get_databaseless_override
+
+    try:
+        yield __client
+    finally:
+        app.dependency_overrides.clear()
 
 
 @pytest.fixture
