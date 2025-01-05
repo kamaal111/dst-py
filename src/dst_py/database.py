@@ -1,5 +1,3 @@
-from typing import Any, Generator
-
 from sqlalchemy import Engine
 from sqlmodel import SQLModel, create_engine
 
@@ -23,9 +21,9 @@ class Database(BaseDatabase):
         super().__init__(create_engine(settings.database_url, echo=True))
 
 
-database = Database()
+database: BaseDatabase = Database()
 database.create_db_and_tables()
 
 
-def get_database() -> Generator[BaseDatabase, Any, None]:
+def get_database():
     yield database
