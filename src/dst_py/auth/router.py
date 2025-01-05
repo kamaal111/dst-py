@@ -1,72 +1,28 @@
-import random
-from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
+from typing import Annotated
 
-import jwt
-import requests
-from fastapi import APIRouter, Depends, Form, HTTPException
-from pydantic import EmailStr, ValidationError
-from sqlmodel import Session
+from fastapi import APIRouter, Depends, Form
+from pydantic import EmailStr
 
-from dst_py.conf import settings
-from dst_py.database import Database, get_database
-
-from .exceptions import InvalidCredentials
-from .models import User
-from .schemas import LoginResponse, UserSchema
+from .controller import AuthController, get_auth_controller
+from .schemas import LoginResponse
 
 auth_router = APIRouter(prefix="/auth")
 
 
 @auth_router.post("/register", status_code=HTTPStatus.CREATED)
 def register(
-    email: EmailStr = Form(),
-    password: str = Form(),
-    database: Database = Depends(get_database),
+    email: Annotated[EmailStr, Form()],
+    password: Annotated[str, Form()],
+    controller: Annotated[AuthController, Depends(get_auth_controller)],
 ):
-    try:
-        validated_payload = UserSchema(email=email, password=password)
-    except ValidationError as e:
-        raise HTTPException(400, e.errors()) from e
-
-    with Session(database.engine) as session:
-        User.create(payload=validated_payload, session=session)
-
-        return {"details": "Created"}
+    return controller.register(email=email, password=password)
 
 
 @auth_router.post("/login", status_code=HTTPStatus.OK)
 def login(
-    email: EmailStr = Form(),
-    password: str = Form(),
-    database: Database = Depends(get_database),
+    email: Annotated[EmailStr, Form()],
+    password: Annotated[str, Form()],
+    controller: Annotated[AuthController, Depends(get_auth_controller)],
 ) -> LoginResponse:
-    try:
-        validated_payload = UserSchema(email=email, password=password)
-    except ValidationError as e:
-        raise HTTPException(400, e.errors()) from e
-
-    with Session(database.engine) as session:
-        user = User.get_by_email(email=validated_payload.email, session=session)
-        if user is None:
-            raise InvalidCredentials()
-
-    if not user.verify_password(raw_password=validated_payload.password):
-        raise InvalidCredentials()
-
-    expire = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_expire_minutes)
-    access_token = jwt.encode(
-        {"sub": user.id, "exp": expire},
-        settings.jwt_secret_key,
-        algorithm=settings.jwt_algorithm,
-    )
-    random_value = random.random()
-    response = requests.get("https://jsonplaceholder.typicode.com/users")
-    response.raise_for_status()
-
-    return LoginResponse(
-        access_token=access_token,
-        token_type="bearer",
-        random=random_value,
-        external_data=response.json(),
-    )
+    return controller.login(email=email, password=password)
