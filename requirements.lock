@@ -16,9 +16,8 @@ anyio==4.7.0
     # via httpx
     # via starlette
     # via watchfiles
-bcrypt==4.0.1
+bcrypt==4.2.1
     # via dst-py
-    # via passlib
 certifi==2024.12.14
     # via httpcore
     # via httpx
@@ -60,8 +59,6 @@ markupsafe==3.0.2
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
-passlib==1.7.4
-    # via dst-py
 pydantic==2.10.4
     # via fastapi
     # via pydantic-settings

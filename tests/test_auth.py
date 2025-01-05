@@ -1,6 +1,9 @@
 from http import HTTPStatus
 
 import responses
+from sqlmodel import Session
+
+from dst_py.auth.models import User
 
 USER = {
     "address": {
@@ -56,3 +59,21 @@ def test_deterministic_login(
         json_response["access_token"]
         == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImV4cCI6MTczNTcyNzQwMH0.WB-Skcc2-Qjtmun2SftTdCeSpGmpZOHmXGfeAvapidA"
     )
+
+
+def test_register(client, database):
+    register_response = client.post(
+        "/auth/register",
+        data={"email": "yuno@golden.io", "password": "password-to-keep"},
+    )
+    json_response = register_response.json()
+
+    assert register_response.status_code == HTTPStatus.CREATED
+    assert json_response["details"] == "Created"
+
+    with Session(database.engine) as session:
+        user = User.get_by_email(email="yuno@golden.io", session=session)
+
+        assert user is not None
+        assert user.email == "yuno@golden.io"
+        assert user.verify_password(raw_password="password-to-keep")

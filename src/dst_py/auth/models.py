@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from passlib.context import CryptContext
+import bcrypt
 from pydantic import EmailStr
 from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, SQLModel, Session, select
@@ -8,7 +8,7 @@ from sqlmodel import Field, SQLModel, Session, select
 from .exceptions import UserAlreadyExists
 from .schemas import UserSchema
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+PASSWORD_HASHING_ENCODING = "utf-8"
 
 
 class User(SQLModel, table=True):
@@ -17,10 +17,13 @@ class User(SQLModel, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     email: EmailStr
-    password: str
+    password: bytes
 
     def verify_password(self, raw_password: str) -> bool:
-        return pwd_context.verify(raw_password, self.password)
+        return bcrypt.checkpw(
+            raw_password.encode(PASSWORD_HASHING_ENCODING),
+            self.password,
+        )
 
     @staticmethod
     def get_by_email(email: str, session: Session) -> User | None:
@@ -34,8 +37,14 @@ class User(SQLModel, table=True):
         if existing_user is not None:
             raise UserAlreadyExists()
 
-        hashed_password = pwd_context.hash(payload.password)
-        user = User(email=payload.email, password=hashed_password)
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(
+            payload.password.encode(PASSWORD_HASHING_ENCODING), salt
+        )
+        user = User(
+            email=payload.email,
+            password=hashed_password,
+        )
 
         session.add(user)
         if commit:

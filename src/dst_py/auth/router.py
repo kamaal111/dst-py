@@ -30,9 +30,9 @@ def register(
         raise HTTPException(400, e.errors()) from e
 
     with Session(database.engine) as session:
-        user = User.create(payload=validated_payload, session=session)
+        User.create(payload=validated_payload, session=session)
 
-        return {"email": user.email}
+        return {"details": "Created"}
 
 
 @auth_router.post("/login", status_code=HTTPStatus.OK)
