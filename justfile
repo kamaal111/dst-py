@@ -46,6 +46,20 @@ test-cov:
     . .venv/bin/activate
     pytest --cov=src/dst_py tests/
 
+# Lint code
+lint:
+    #!/bin/zsh
+
+    . .venv/bin/activate
+    ruff check .
+
+# Lint and fix any issues that can be fixed automatically
+lint-fix:
+    #!/bin/zsh
+
+    . .venv/bin/activate
+    ruff check . --fix
+
 # Prepare project to work with
 prepare: install-modules
 

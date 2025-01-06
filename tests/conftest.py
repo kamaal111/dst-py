@@ -10,7 +10,7 @@ from sqlmodel import Session, select
 
 from dst_py.auth.models import User
 from dst_py.auth.schemas import UserSchema
-from dst_py.database import BaseDatabase, get_database
+from dst_py.database import BaseDatabase, create_db_and_tables, get_database
 from dst_py.main import app
 
 
@@ -39,7 +39,7 @@ def database():
     temporary_directory = __get_or_create_temporary_directory_if_not_exists()
     database_path = temporary_directory / f"{uuid.uuid4()}.db"
     database = DatabaseForTests(f"sqlite:///{database_path}")
-    database.create_db_and_tables()
+    create_db_and_tables(database)
 
     try:
         yield database

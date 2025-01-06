@@ -1,7 +1,7 @@
 import random
 from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
-from typing import Annotated
+from typing import Annotated, Any, Generator, Protocol
 
 import jwt
 import requests
@@ -10,20 +10,26 @@ from pydantic import ValidationError
 from sqlmodel import Session
 
 from dst_py.conf import settings
-from dst_py.database import BaseDatabase, get_database
+from dst_py.database import Databaseable, get_database
 
 from .exceptions import InvalidCredentials
 from .models import User
-from .schemas import LoginResponse, UserSchema
+from .schemas import LoginResponse, RegisterResponse, UserSchema
+
+
+class AuthControllable(Protocol):
+    database: Databaseable
+
+    def register(self, email: str, password: str) -> RegisterResponse: ...
+
+    def login(self, email: str, password: str) -> LoginResponse: ...
 
 
 class AuthController:
-    database: BaseDatabase
-
-    def __init__(self, database: BaseDatabase) -> None:
+    def __init__(self, database: Databaseable) -> None:
         self.database = database
 
-    def register(self, email: str, password: str):
+    def register(self, email: str, password: str) -> RegisterResponse:
         try:
             validated_payload = UserSchema(email=email, password=password)
         except ValidationError as e:
@@ -32,9 +38,9 @@ class AuthController:
         with Session(self.database.engine) as session:
             User.create(payload=validated_payload, session=session)
 
-            return {"details": "Created"}
+            return RegisterResponse(details="Created")
 
-    def login(self, email: str, password: str):
+    def login(self, email: str, password: str) -> LoginResponse:
         try:
             validated_payload = UserSchema(email=email, password=password)
         except ValidationError as e:
@@ -61,6 +67,7 @@ class AuthController:
         response.raise_for_status()
 
         return LoginResponse(
+            details="OK",
             access_token=access_token,
             token_type="bearer",
             random=random_value,
@@ -68,6 +75,8 @@ class AuthController:
         )
 
 
-def get_auth_controller(database: Annotated[BaseDatabase, Depends(get_database)]):
+def get_auth_controller(
+    database: Annotated[Databaseable, Depends(get_database)],
+) -> Generator[AuthControllable, Any, None]:
     controller = AuthController(database=database)
     yield controller

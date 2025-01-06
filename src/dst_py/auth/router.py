@@ -4,8 +4,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Form
 from pydantic import EmailStr
 
-from .controller import AuthController, get_auth_controller
-from .schemas import LoginResponse
+from .controller import AuthControllable, get_auth_controller
+from .schemas import LoginResponse, RegisterResponse
 
 auth_router = APIRouter(prefix="/auth")
 
@@ -14,8 +14,8 @@ auth_router = APIRouter(prefix="/auth")
 def register(
     email: Annotated[EmailStr, Form()],
     password: Annotated[str, Form()],
-    controller: Annotated[AuthController, Depends(get_auth_controller)],
-):
+    controller: Annotated[AuthControllable, Depends(get_auth_controller)],
+) -> RegisterResponse:
     return controller.register(email=email, password=password)
 
 
@@ -23,6 +23,6 @@ def register(
 def login(
     email: Annotated[EmailStr, Form()],
     password: Annotated[str, Form()],
-    controller: Annotated[AuthController, Depends(get_auth_controller)],
+    controller: Annotated[AuthControllable, Depends(get_auth_controller)],
 ) -> LoginResponse:
     return controller.login(email=email, password=password)

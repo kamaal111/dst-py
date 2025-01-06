@@ -138,6 +138,7 @@ starlette==0.41.3
     # via fastapi
 typer==0.15.1
     # via fastapi-cli
+types-requests==2.32.0.20241016
 typing-extensions==4.12.2
     # via anyio
     # via fastapi
@@ -149,6 +150,7 @@ typing-extensions==4.12.2
 urllib3==2.3.0
     # via requests
     # via responses
+    # via types-requests
 uvicorn==0.34.0
     # via fastapi
     # via fastapi-cli
