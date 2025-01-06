@@ -15,7 +15,7 @@ class BaseDatabase:
         self.engine = engine
 
 
-def create_db_and_tables(database: Databaseable):
+def create_db_and_tables(database: Databaseable) -> None:
     from dst_py.auth.models import User  # noqa: F401
 
     SQLModel.metadata.create_all(database.engine)

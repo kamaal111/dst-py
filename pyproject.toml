@@ -36,6 +36,7 @@ dev-dependencies = [
     "freezegun>=1.5.1",
     "responses>=0.25.3",
     "types-requests>=2.32.0.20241016",
+    "mypy>=1.14.1",
 ]
 
 [tool.hatch.metadata]

@@ -46,6 +46,16 @@ test-cov:
     . .venv/bin/activate
     pytest --cov=src/dst_py tests/
 
+# Run quality scripts
+quality: prepare lint type-check
+
+# Check types are correct
+type-check:
+    #!/bin/zsh
+
+    . .venv/bin/activate
+    mypy .
+
 # Lint code
 lint:
     #!/bin/zsh
@@ -64,10 +74,7 @@ lint-fix:
 prepare: install-modules
 
 # Bootstrap project
-bootstrap: install-rye prepare
-    #!/bin/zsh
-
-    just setup-pre-commit
+bootstrap: install-rye prepare setup-pre-commit
 
 # Set up dev container. This step runs after building the dev container
 post-dev-container-create:

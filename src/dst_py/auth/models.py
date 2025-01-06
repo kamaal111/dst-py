@@ -12,7 +12,7 @@ PASSWORD_HASHING_ENCODING = "utf-8"
 
 
 class User(SQLModel, table=True):
-    __tablename__: str = "user"
+    __tablename__: str = "user"  # type: ignore
     __table_args__ = (UniqueConstraint("email"),)
 
     id: int | None = Field(default=None, primary_key=True)
